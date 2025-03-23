@@ -7,22 +7,76 @@ document.addEventListener("DOMContentLoaded", function () {
 	const loadingElement = document.getElementById("loading");
 	const languageRadios = document.getElementsByName("language");
 	const themeToggle = document.getElementById("theme-toggle");
+	const patternText = document.getElementById("pattern-text");
+	const exampleText = document.getElementById("example-text");
+
+	// Conteúdo multilíngue
+	const content = {
+		english: {
+			pattern: "Pattern: <code>&lt;type&gt;: &lt;description&gt;</code>",
+			examples: "Examples: <code>feat: add login functionality</code> | <code>fix: resolve null pointer exception</code>",
+			placeholder: "Describe your changes or paste your code here...",
+			generateButton: "Generate Commit",
+			copyButton: "Copy",
+			resultTitle: "Commit Message:",
+			loading: "Generating commit...",
+			copiedText: "Copied!",
+			errorEmpty: "Please enter a description or code to generate a commit.",
+			errorServer: "Error connecting to server: "
+		},
+		portuguese: {
+			pattern: "Padrão: <code>&lt;type&gt;: &lt;description&gt;</code>",
+			examples: "Exemplos: <code>feat: adicionar funcionalidade de login</code> | <code>fix: resolver exceção de ponteiro nulo</code>",
+			placeholder: "Descreva suas alterações ou cole seu código aqui...",
+			generateButton: "Gerar Commit",
+			copyButton: "Copiar",
+			resultTitle: "Mensagem de Commit:",
+			loading: "Gerando commit...",
+			copiedText: "Copiado!",
+			errorEmpty: "Por favor, insira uma descrição ou código para gerar o commit.",
+			errorServer: "Erro ao conectar ao servidor: "
+		}
+	};
+
+	// Função para atualizar o idioma da interface
+	function updateLanguage(language) {
+		const langContent = content[language];
+
+		// Atualizar textos estáticos
+		patternText.innerHTML = langContent.pattern;
+		exampleText.innerHTML = langContent.examples;
+		commitInput.placeholder = langContent.placeholder;
+		generateBtn.textContent = langContent.generateButton;
+		copyBtn.textContent = langContent.copyButton;
+
+		document.querySelector(".result-header h3").textContent = langContent.resultTitle;
+		document.querySelector(".loading p").textContent = langContent.loading;
+	}
+
+	// Adicionar eventos para os radio buttons de idioma
+	languageRadios.forEach((radio) => {
+		radio.addEventListener("change", function () {
+			updateLanguage(this.value);
+		});
+	});
 
 	// Função para gerar o commit
 	async function generateCommit() {
 		const text = commitInput.value.trim();
-		if (!text) {
-			alert("Por favor, insira uma descrição ou código para gerar o commit.");
-			return;
-		}
+		let selectedLanguage = "english";
 
-		// Obter o idioma selecionado
-		let language = "english";
 		for (const radio of languageRadios) {
 			if (radio.checked) {
-				language = radio.value;
+				selectedLanguage = radio.value;
 				break;
 			}
+		}
+
+		const langContent = content[selectedLanguage];
+
+		if (!text) {
+			alert(langContent.errorEmpty);
+			return;
 		}
 
 		// Mostrar loading e esconder resultados anteriores
@@ -38,7 +92,7 @@ document.addEventListener("DOMContentLoaded", function () {
 				},
 				body: JSON.stringify({
 					text: text,
-					language: language
+					language: selectedLanguage
 				})
 			});
 
@@ -57,7 +111,7 @@ document.addEventListener("DOMContentLoaded", function () {
 			resultContainer.classList.remove("hidden");
 		} catch (error) {
 			loadingElement.classList.add("hidden");
-			resultElement.textContent = `Erro ao conectar ao servidor: ${error.message}`;
+			resultElement.textContent = `${langContent.errorServer}${error.message}`;
 			resultContainer.classList.remove("hidden");
 		}
 	}
@@ -77,11 +131,22 @@ document.addEventListener("DOMContentLoaded", function () {
 	// Função para copiar o commit para a área de transferência
 	copyBtn.addEventListener("click", function () {
 		const commitMessage = resultElement.textContent;
+		let selectedLanguage = "english";
+
+		for (const radio of languageRadios) {
+			if (radio.checked) {
+				selectedLanguage = radio.value;
+				break;
+			}
+		}
+
+		const langContent = content[selectedLanguage];
+
 		navigator.clipboard
 			.writeText(commitMessage)
 			.then(() => {
 				const originalText = copyBtn.textContent;
-				copyBtn.textContent = "Copiado!";
+				copyBtn.textContent = langContent.copiedText;
 
 				setTimeout(() => {
 					copyBtn.textContent = originalText;
@@ -119,4 +184,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	// Configurar o tema inicial
 	setInitialTheme();
+
+	// Inicializar com o idioma selecionado
+	let initialLanguage = "english";
+	for (const radio of languageRadios) {
+		if (radio.checked) {
+			initialLanguage = radio.value;
+			break;
+		}
+	}
+	updateLanguage(initialLanguage);
 });

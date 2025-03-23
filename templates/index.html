@@ -34,20 +34,20 @@
 				<!-- Padrão e exemplos (movido para baixo da caixa de texto) -->
 				<div class="pattern-container">
 					<div class="pattern-header">
-						<span>Padrão: <code>&lt;type&gt;: &lt;description&gt;</code></span>
+						<span id="pattern-text">Padrão: <code>&lt;type&gt;: &lt;description&gt;</code></span>
 						<div class="language-selector">
 							<label> <input type="radio" name="language" value="english" checked /> English </label>
 							<label> <input type="radio" name="language" value="portuguese" /> Português </label>
 						</div>
 					</div>
 					<div class="pattern-example">
-						<p>Exemplos: <code>feat: add login functionality</code> | <code>fix: resolve null pointer exception</code></p>
+						<p id="example-text">Exemplos: <code>feat: add login functionality</code> | <code>fix: resolve null pointer exception</code></p>
 					</div>
 				</div>
 
 				<!-- Área de entrada principal -->
 				<div class="input-group">
-					<textarea id="commit-input" style="height: 100px;" placeholder="Descreva suas alterações ou cole seu código aqui..." rows="6"></textarea>
+					<textarea id="commit-input" style="height: 100px" placeholder="Descreva suas alterações ou cole seu código aqui..." rows="6"></textarea>
 					<button id="generate-btn" class="primary-btn">Gerar Commit</button>
 				</div>
 
