@@ -47,7 +47,10 @@
 
 				<!-- Área de entrada principal -->
 				<div class="input-group">
-					<textarea id="commit-input" style="height: 100px" placeholder="Descreva suas alterações ou cole seu código aqui..." rows="6"></textarea>
+					<div class="textarea-container">
+						<textarea id="commit-input" style="height: 100px" placeholder="Descreva suas alterações ou cole seu código aqui..." rows="6" maxlength="500"></textarea>
+						<div class="char-counter"><span id="char-count">0</span>/500</div>
+					</div>
 					<button id="generate-btn" class="primary-btn">Gerar Commit</button>
 				</div>
 

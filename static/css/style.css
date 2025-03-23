@@ -147,6 +147,50 @@ html[data-theme="dark"] .subtitle {
     white-space: nowrap;
 }
 
+/* Estilos para o container de textarea e contador */
+.textarea-container {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.textarea-container textarea {
+    width: 100%;
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 1rem;
+    background-color: var(--container-bg);
+    color: var(--text-color);
+}
+
+.char-counter {
+    position: absolute;
+    bottom: 5px;
+    right: 10px;
+    font-size: 0.75rem;
+    color: #666;
+    background-color: rgba(var(--container-bg-rgb), 0.7);
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+
+html[data-theme="dark"] .char-counter {
+    color: #aaa;
+    background-color: rgba(22, 27, 34, 0.7);
+}
+
+.char-counter.limit-near {
+    color: #ff9800;
+}
+
+.char-counter.limit-reached {
+    color: #f44336;
+}
+
 /* Estilo para o container de resultado */
 #result-container {
     margin-top: 20px;

@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	const themeToggle = document.getElementById("theme-toggle");
 	const patternText = document.getElementById("pattern-text");
 	const exampleText = document.getElementById("example-text");
+	const charCount = document.getElementById("char-count");
 
 	// Conteúdo multilíngue
 	const content = {
@@ -60,6 +61,21 @@ document.addEventListener("DOMContentLoaded", function () {
 		});
 	});
 
+	// Contador de caracteres
+	commitInput.addEventListener("input", function () {
+		const currentLength = commitInput.value.length;
+		charCount.textContent = currentLength;
+
+		const charCounter = document.querySelector(".char-counter");
+		charCounter.classList.remove("limit-near", "limit-reached");
+
+		if (currentLength >= 400 && currentLength < 500) {
+			charCounter.classList.add("limit-near");
+		} else if (currentLength >= 500) {
+			charCounter.classList.add("limit-reached");
+		}
+	});
+
 	// Função para gerar o commit
 	async function generateCommit() {
 		const text = commitInput.value.trim();
@@ -76,6 +92,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
 		if (!text) {
 			alert(langContent.errorEmpty);
+			return;
+		}
+
+		// Verificar o limite de caracteres
+		if (text.length > 500) {
+			alert(selectedLanguage === "english" ? "Text exceeds the 500 character limit." : "O texto excede o limite de 500 caracteres.");
 			return;
 		}
 
@@ -194,4 +216,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		}
 	}
 	updateLanguage(initialLanguage);
+
+	// Inicializar contador
+	charCount.textContent = commitInput.value.length;
 });
