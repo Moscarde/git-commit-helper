@@ -10,6 +10,11 @@ document.addEventListener("DOMContentLoaded", function () {
 	const patternText = document.getElementById("pattern-text");
 	const exampleText = document.getElementById("example-text");
 	const charCount = document.getElementById("char-count");
+	const limitModal = document.getElementById("limit-modal");
+	const closeModalBtn = document.getElementById("close-modal-btn");
+	const closeModalX = document.querySelector(".close-modal");
+	const modalTitle = document.getElementById("modal-title");
+	const modalMessage = document.getElementById("modal-message");
 
 	// Conteúdo multilíngue
 	const content = {
@@ -76,6 +81,58 @@ document.addEventListener("DOMContentLoaded", function () {
 		}
 	});
 
+	// Função para verificar o limite de uso
+	async function checkUsageLimit() {
+		try {
+			const response = await fetch("/check-limit");
+			const data = await response.json();
+
+			if (data.limit_reached) {
+				showLimitExceededModal(data.daily_limit);
+			}
+		} catch (error) {
+			console.error("Erro ao verificar limite de uso:", error);
+		}
+	}
+
+	// Função para mostrar o modal de limite excedido
+	function showLimitExceededModal(dailyLimit) {
+		// Configurar conteúdo baseado no idioma selecionado
+		let selectedLanguage = "english";
+		for (const radio of languageRadios) {
+			if (radio.checked) {
+				selectedLanguage = radio.value;
+				break;
+			}
+		}
+
+		if (selectedLanguage === "english") {
+			modalTitle.textContent = "Daily Usage Limit Exceeded";
+			modalMessage.innerHTML = `You have reached the limit of <strong>${dailyLimit} commit generations</strong> for today.`;
+		} else {
+			modalTitle.textContent = "Limite de Uso Diário Excedido";
+			modalMessage.innerHTML = `Você atingiu o limite de <strong>${dailyLimit} gerações de commit</strong> para hoje.`;
+		}
+
+		// Mostrar o modal
+		limitModal.classList.remove("hidden");
+	}
+
+	// Funções para fechar o modal
+	function closeModal() {
+		limitModal.classList.add("hidden");
+	}
+
+	closeModalBtn.addEventListener("click", closeModal);
+	closeModalX.addEventListener("click", closeModal);
+
+	// Fechar modal ao clicar fora dele
+	limitModal.addEventListener("click", function (e) {
+		if (e.target === limitModal) {
+			closeModal();
+		}
+	});
+
 	// Função para gerar o commit
 	async function generateCommit() {
 		const text = commitInput.value.trim();
@@ -122,6 +179,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
 			// Esconder loading e mostrar resultado
 			loadingElement.classList.add("hidden");
+
+			// Verificar se o limite foi excedido
+			if (response.status === 429 || data.limit_exceeded) {
+				showLimitExceededModal(data.daily_limit || 3);
+				return;
+			}
 
 			if (data.error) {
 				resultElement.textContent = `Erro: ${data.error}`;
@@ -219,4 +282,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	// Inicializar contador
 	charCount.textContent = commitInput.value.length;
+
+	// Verificar limite de uso ao carregar a página
+	checkUsageLimit();
+
+	// Botão de debug para testar o modal
+	const debugShowModalBtn = document.getElementById("debug-show-modal");
+	if (debugShowModalBtn) {
+		debugShowModalBtn.addEventListener("click", function () {
+			showLimitExceededModal(3 || 3);
+		});
+	}
 });

@@ -75,6 +75,22 @@
 			<p>Desenvolvido por <a href="https://github.com/moscarde" target="_blank">Gabriel Moscarde</a> para ajudar iniciantes em programação.</p>
 		</footer>
 
+		<!-- Modal de limite excedido -->
+		<div id="limit-modal" class="modal hidden">
+			<div class="modal-content">
+				<span class="close-modal">&times;</span>
+				<h2 id="modal-title">Limite de Uso Diário Excedido</h2>
+				<p id="modal-message"> Você atingiu o limite de <strong>3 gerações de commit</strong> para hoje. </p>
+				<p> Este é um projeto conceitual que utiliza a API gratuita do Gemini, que possui limitações. </p>
+				<p> Opção 1: Volte amanhã para mais 3 gerações gratuitas. </p>
+				<p> Opção 2: Você pode obter sua própria chave API gratuita do Gemini e rodar o projeto localmente sem limitações. </p>
+				<div class="modal-actions">
+					<a href="https://github.com/Moscarde/git-commit-helper" target="_blank" class="modal-button primary-btn"> Ver Tutorial no GitHub </a>
+					<button class="modal-button secondary-btn" id="close-modal-btn">Fechar</button>
+				</div>
+			</div>
+		</div>
+
 		<script src="{{ url_for('static', filename='js/script.js') }}"></script>
 	</body>
 </html>

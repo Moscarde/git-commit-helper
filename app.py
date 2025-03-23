@@ -1,9 +1,12 @@
 import os
 import re
+import time
+from collections import defaultdict
+from datetime import datetime, timedelta
 
 import google.generativeai as genai
 from dotenv import load_dotenv
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, make_response, render_template, request
 
 app = Flask(__name__)
 
@@ -16,15 +19,76 @@ model = genai.GenerativeModel("gemini-1.5-flash")
 # Constante para o limite de caracteres
 MAX_CHARS = 500
 
+# Sistema de controle de uso - armazenamento em memória
+# Em um ambiente de produção, seria melhor usar um banco de dados
+usage_tracker = defaultdict(lambda: {"count": 0, "reset_time": None})
+DAILY_LIMIT = 3
+
 
 @app.route("/")
 def index():
     return render_template("index.html")
 
 
+@app.route("/check-limit", methods=["GET"])
+def check_limit():
+    # Obter ID do usuário (usando IP como identificador simples)
+    user_id = request.remote_addr
+
+    # Verificar se o usuário já tem um registro
+    user_data = usage_tracker[user_id]
+
+    # Verificar se é um novo dia (resetar contagem)
+    now = datetime.now()
+    if user_data["reset_time"] is None or now > user_data["reset_time"]:
+        user_data["count"] = 0
+        # Definir o tempo de reset para o final do dia atual
+        user_data["reset_time"] = now.replace(
+            hour=23, minute=59, second=59
+        ) + timedelta(seconds=1)
+
+    # Retornar o status do limite
+    remaining = max(0, DAILY_LIMIT - user_data["count"])
+    return jsonify(
+        {
+            "remaining_uses": remaining,
+            "limit_reached": remaining <= 0,
+            "daily_limit": DAILY_LIMIT,
+        }
+    )
+
+
 @app.route("/generate-commit", methods=["POST"])
 def generate_commit():
     try:
+        # Obter ID do usuário (usando IP como identificador simples)
+        user_id = request.remote_addr
+
+        # Verificar se o usuário já tem um registro
+        user_data = usage_tracker[user_id]
+
+        # Verificar se é um novo dia (resetar contagem)
+        now = datetime.now()
+        if user_data["reset_time"] is None or now > user_data["reset_time"]:
+            user_data["count"] = 0
+            # Definir o tempo de reset para o final do dia atual
+            user_data["reset_time"] = now.replace(
+                hour=23, minute=59, second=59
+            ) + timedelta(seconds=1)
+
+        # Verificar se o usuário excedeu o limite
+        if user_data["count"] >= DAILY_LIMIT:
+            return (
+                jsonify(
+                    {
+                        "error": "Daily limit exceeded",
+                        "limit_exceeded": True,
+                        "daily_limit": DAILY_LIMIT,
+                    }
+                ),
+                429,
+            )  # 429 Too Many Requests
+
         data = request.json
         text = data.get("text", "")
         language = data.get("language", "english")
@@ -45,7 +109,6 @@ def generate_commit():
             )
 
         # Sanitizar a entrada para prevenir prompt injection
-        # Remove qualquer tentativa de manipular o prompt com comandos especiais
         text = sanitize_input(text)
 
         # Criar prompt baseado no idioma
@@ -56,7 +119,21 @@ def generate_commit():
 
         # Fazer a chamada à API com tratamento de erro melhorado
         response = model.generate_content(prompt)
-        return jsonify({"message": response.text})
+
+        # Incrementar o contador de uso para este usuário
+        user_data["count"] += 1
+
+        # Retornar os dados de uso junto com a resposta
+        return jsonify(
+            {
+                "message": response.text,
+                "usage": {
+                    "count": user_data["count"],
+                    "remaining": DAILY_LIMIT - user_data["count"],
+                    "daily_limit": DAILY_LIMIT,
+                },
+            }
+        )
     except Exception as e:
         # Log do erro sem expor detalhes sensíveis
         app.logger.error(f"Error generating commit: {type(e).__name__}")
