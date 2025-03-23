@@ -173,8 +173,8 @@ document.addEventListener("DOMContentLoaded", function () {
 		const savedTheme = localStorage.getItem("theme");
 		if (savedTheme) {
 			document.documentElement.setAttribute("data-theme", savedTheme);
-		} else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-			// Se não houver tema salvo mas o sistema preferir modo escuro
+		} else {
+			// Usar tema escuro como padrão
 			document.documentElement.setAttribute("data-theme", "dark");
 		}
 	}

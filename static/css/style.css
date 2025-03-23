@@ -39,6 +39,9 @@ body {
     min-height: 100vh;
     background-color: var(--background-color);
     color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 /* Theme toggle button */
@@ -299,7 +302,6 @@ html[data-theme="dark"] .spinner {
 
 footer {
     text-align: center;
-    margin-top: 30px;
     font-size: 0.85rem;
     color: #666;
 }
