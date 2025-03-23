@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-br" data-theme="light">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Git Commit Helper</title>
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+	</head>
+	<body>
+		<div class="theme-switch">
+			<button id="theme-toggle" aria-label="Alternar modo escuro">
+				<svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+					<circle cx="12" cy="12" r="5"></circle>
+					<line x1="12" y1="1" x2="12" y2="3"></line>
+					<line x1="12" y1="21" x2="12" y2="23"></line>
+					<line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+					<line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+					<line x1="1" y1="12" x2="3" y2="12"></line>
+					<line x1="21" y1="12" x2="23" y2="12"></line>
+					<line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+					<line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+				</svg>
+				<svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+					<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+				</svg>
+			</button>
+		</div>
+
+		<div class="container">
+			<h1>Git Commit Helper</h1>
+			<p class="subtitle">Gere mensagens de commit seguindo o padrão Conventional Commits</p>
+
+			<div class="form-container">
+				<!-- Padrão e exemplos (movido para baixo da caixa de texto) -->
+				<div class="pattern-container">
+					<div class="pattern-header">
+						<span>Padrão: <code>&lt;type&gt;: &lt;description&gt;</code></span>
+						<div class="language-selector">
+							<label> <input type="radio" name="language" value="english" checked /> English </label>
+							<label> <input type="radio" name="language" value="portuguese" /> Português </label>
+						</div>
+					</div>
+					<div class="pattern-example">
+						<p>Exemplos: <code>feat: add login functionality</code> | <code>fix: resolve null pointer exception</code></p>
+					</div>
+				</div>
+
+				<!-- Área de entrada principal -->
+				<div class="input-group">
+					<textarea id="commit-input" style="height: 100px;" placeholder="Descreva suas alterações ou cole seu código aqui..." rows="6"></textarea>
+					<button id="generate-btn" class="primary-btn">Gerar Commit</button>
+				</div>
+
+				<!-- Área de resultado -->
+				<div id="result-container" class="hidden">
+					<div class="result-header">
+						<h3>Mensagem de Commit:</h3>
+						<button id="copy-btn" class="secondary-btn">Copiar</button>
+					</div>
+					<div id="result" class="result"></div>
+				</div>
+
+				<!-- Indicador de carregamento -->
+				<div id="loading" class="loading hidden">
+					<div class="spinner"></div>
+					<p>Gerando commit...</p>
+				</div>
+			</div>
+		</div>
+
+		<footer>
+			<p>Desenvolvido para ajudar iniciantes em programação</p>
+		</footer>
+
+		<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+	</body>
+</html>
