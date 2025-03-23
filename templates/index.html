@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-br" data-theme="dark">
+<html lang="pt-br" data-theme="dark" data-limit-enabled="{{ 'true' if usage_limit_enabled else 'false' }}">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -75,15 +75,21 @@
 			<p>Desenvolvido por <a href="https://github.com/moscarde" target="_blank">Gabriel Moscarde</a> para ajudar iniciantes em programação.</p>
 		</footer>
 
-		<!-- Modal de limite excedido -->
+		<!-- Modal de limite excedido - Modificado para mostrar instruções diferentes quando em ambiente local -->
 		<div id="limit-modal" class="modal hidden">
 			<div class="modal-content">
 				<span class="close-modal">&times;</span>
 				<h2 id="modal-title">Limite de Uso Diário Excedido</h2>
 				<p id="modal-message"> Você atingiu o limite de <strong>3 gerações de commit</strong> para hoje. </p>
-				<p> Este é um projeto conceitual que utiliza a API gratuita do Gemini, que possui limitações. </p>
-				<p> Opção 1: Volte amanhã para mais 3 gerações gratuitas. </p>
-				<p> Opção 2: Você pode obter sua própria chave API gratuita do Gemini e rodar o projeto localmente sem limitações. </p>
+				<div id="deploy-instructions">
+					<p> Este é um projeto conceitual que utiliza a API gratuita do Gemini, que possui limitações. </p>
+					<p> Opção 1: Volte amanhã para mais 3 gerações gratuitas. </p>
+					<p> Opção 2: Você pode obter sua própria chave API gratuita do Gemini e rodar o projeto localmente sem limitações. </p>
+				</div>
+				<div id="local-instructions" class="hidden">
+					<p>Esta versão local parece estar usando limitação diária.</p>
+					<p>Para remover o limite de uso, defina a variável de ambiente <code>ENABLE_USAGE_LIMIT=False</code> em seu arquivo .env.</p>
+				</div>
 				<div class="modal-actions">
 					<a href="https://github.com/Moscarde/git-commit-helper" target="_blank" class="modal-button primary-btn"> Ver Tutorial no GitHub </a>
 					<button class="modal-button secondary-btn" id="close-modal-btn">Fechar</button>

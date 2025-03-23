@@ -401,11 +401,39 @@ close-modal:hover {
 .modal h2 {
     color: var(--primary-color);
     margin-top: 0;
+    margin-bottom: 15px;
 }
 
 .modal p {
-    margin: 15px 0;
+    margin: 12px 0;
     line-height: 1.5;
+}
+
+.modal code {
+    background-color: var(--code-bg);
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-family: monospace;
+    font-size: 0.9rem;
+}
+
+.modal h2 {
+    color: var(--primary-color);
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.modal p {
+    margin: 12px 0;
+    line-height: 1.5;
+}
+
+.modal code {
+    background-color: var(--code-bg);
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-family: monospace;
+    font-size: 0.9rem;
 }
 
 .modal-actions {

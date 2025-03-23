@@ -81,14 +81,20 @@ document.addEventListener("DOMContentLoaded", function () {
 		}
 	});
 
+	// Verificar se a limitação está ativa
+	const limitEnabled = document.documentElement.getAttribute("data-limit-enabled") === "true";
+
 	// Função para verificar o limite de uso
 	async function checkUsageLimit() {
+		// Se as limitações estiverem desativadas, não verificamos
+		if (!limitEnabled) return;
+
 		try {
 			const response = await fetch("/check-limit");
 			const data = await response.json();
 
 			if (data.limit_reached) {
-				showLimitExceededModal(data.daily_limit);
+				showLimitExceededModal(data.daily_limit, data.limit_enabled);
 			}
 		} catch (error) {
 			console.error("Erro ao verificar limite de uso:", error);
@@ -96,7 +102,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	}
 
 	// Função para mostrar o modal de limite excedido
-	function showLimitExceededModal(dailyLimit) {
+	function showLimitExceededModal(dailyLimit, isServerEnvironment = true) {
 		// Configurar conteúdo baseado no idioma selecionado
 		let selectedLanguage = "english";
 		for (const radio of languageRadios) {
@@ -106,6 +112,7 @@ document.addEventListener("DOMContentLoaded", function () {
 			}
 		}
 
+		// Ajustar o título e a mensagem com base no idioma
 		if (selectedLanguage === "english") {
 			modalTitle.textContent = "Daily Usage Limit Exceeded";
 			modalMessage.innerHTML = `You have reached the limit of <strong>${dailyLimit} commit generations</strong> for today.`;
@@ -113,6 +120,10 @@ document.addEventListener("DOMContentLoaded", function () {
 			modalTitle.textContent = "Limite de Uso Diário Excedido";
 			modalMessage.innerHTML = `Você atingiu o limite de <strong>${dailyLimit} gerações de commit</strong> para hoje.`;
 		}
+
+		// Mostrar instruções apropriadas com base no ambiente
+		document.getElementById("deploy-instructions").classList.toggle("hidden", !isServerEnvironment);
+		document.getElementById("local-instructions").classList.toggle("hidden", isServerEnvironment);
 
 		// Mostrar o modal
 		limitModal.classList.remove("hidden");
@@ -177,12 +188,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
 			const data = await response.json();
 
-			// Esconder loading e mostrar resultado
+			// Esconder loading
 			loadingElement.classList.add("hidden");
 
-			// Verificar se o limite foi excedido
-			if (response.status === 429 || data.limit_exceeded) {
-				showLimitExceededModal(data.daily_limit || 3);
+			// Verificar se o limite foi excedido (apenas se a limitação estiver ativada)
+			if ((response.status === 429 || data.limit_exceeded) && data.usage && data.usage.limit_enabled) {
+				showLimitExceededModal(data.daily_limit || 3, true);
 				return;
 			}
 

@@ -13,6 +13,10 @@ app = Flask(__name__)
 # Carregar variáveis de ambiente
 load_dotenv()
 API_KEY = os.environ.get("API_KEY")
+# Verifica se estamos em ambiente de deploy ou local
+# Por padrão, ambientes locais não terão limites de uso
+ENABLE_USAGE_LIMIT = os.environ.get("ENABLE_USAGE_LIMIT", "False").lower() == "true"
+
 genai.configure(api_key=API_KEY)
 model = genai.GenerativeModel("gemini-1.5-flash")
 
@@ -27,11 +31,23 @@ DAILY_LIMIT = 3
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    # Passar informação se a limitação está ativa para o front-end
+    return render_template("index.html", usage_limit_enabled=ENABLE_USAGE_LIMIT)
 
 
 @app.route("/check-limit", methods=["GET"])
 def check_limit():
+    # Se a limitação estiver desativada, sempre retorna que há usos disponíveis
+    if not ENABLE_USAGE_LIMIT:
+        return jsonify(
+            {
+                "remaining_uses": 999,
+                "limit_reached": False,
+                "daily_limit": DAILY_LIMIT,
+                "limit_enabled": False,
+            }
+        )
+
     # Obter ID do usuário (usando IP como identificador simples)
     user_id = request.remote_addr
 
@@ -54,6 +70,7 @@ def check_limit():
             "remaining_uses": remaining,
             "limit_reached": remaining <= 0,
             "daily_limit": DAILY_LIMIT,
+            "limit_enabled": True,
         }
     )
 
@@ -61,39 +78,11 @@ def check_limit():
 @app.route("/generate-commit", methods=["POST"])
 def generate_commit():
     try:
-        # Obter ID do usuário (usando IP como identificador simples)
-        user_id = request.remote_addr
-
-        # Verificar se o usuário já tem um registro
-        user_data = usage_tracker[user_id]
-
-        # Verificar se é um novo dia (resetar contagem)
-        now = datetime.now()
-        if user_data["reset_time"] is None or now > user_data["reset_time"]:
-            user_data["count"] = 0
-            # Definir o tempo de reset para o final do dia atual
-            user_data["reset_time"] = now.replace(
-                hour=23, minute=59, second=59
-            ) + timedelta(seconds=1)
-
-        # Verificar se o usuário excedeu o limite
-        if user_data["count"] >= DAILY_LIMIT:
-            return (
-                jsonify(
-                    {
-                        "error": "Daily limit exceeded",
-                        "limit_exceeded": True,
-                        "daily_limit": DAILY_LIMIT,
-                    }
-                ),
-                429,
-            )  # 429 Too Many Requests
-
         data = request.json
         text = data.get("text", "")
         language = data.get("language", "english")
 
-        # Validar tamanho do texto
+        # Validar tamanho do texto (sempre aplicar esta verificação)
         if len(text) > MAX_CHARS:
             return (
                 jsonify(
@@ -108,6 +97,36 @@ def generate_commit():
                 400,
             )
 
+        # Verificação de limite de uso (apenas se ativada)
+        if ENABLE_USAGE_LIMIT:
+            # Obter ID do usuário (usando IP como identificador simples)
+            user_id = request.remote_addr
+
+            # Verificar se o usuário já tem um registro
+            user_data = usage_tracker[user_id]
+
+            # Verificar se é um novo dia (resetar contagem)
+            now = datetime.now()
+            if user_data["reset_time"] is None or now > user_data["reset_time"]:
+                user_data["count"] = 0
+                # Definir o tempo de reset para o final do dia atual
+                user_data["reset_time"] = now.replace(
+                    hour=23, minute=59, second=59
+                ) + timedelta(seconds=1)
+
+            # Verificar se o usuário excedeu o limite
+            if user_data["count"] >= DAILY_LIMIT:
+                return (
+                    jsonify(
+                        {
+                            "error": "Daily limit exceeded",
+                            "limit_exceeded": True,
+                            "daily_limit": DAILY_LIMIT,
+                        }
+                    ),
+                    429,
+                )  # 429 Too Many Requests
+
         # Sanitizar a entrada para prevenir prompt injection
         text = sanitize_input(text)
 
@@ -120,17 +139,26 @@ def generate_commit():
         # Fazer a chamada à API com tratamento de erro melhorado
         response = model.generate_content(prompt)
 
-        # Incrementar o contador de uso para este usuário
-        user_data["count"] += 1
+        # Incrementar o contador de uso apenas se a limitação estiver ativa
+        if ENABLE_USAGE_LIMIT:
+            usage_tracker[request.remote_addr]["count"] += 1
+            remaining = DAILY_LIMIT - usage_tracker[request.remote_addr]["count"]
+        else:
+            remaining = 999  # Valor arbitrário alto para representar "ilimitado"
 
         # Retornar os dados de uso junto com a resposta
         return jsonify(
             {
                 "message": response.text,
                 "usage": {
-                    "count": user_data["count"],
-                    "remaining": DAILY_LIMIT - user_data["count"],
-                    "daily_limit": DAILY_LIMIT,
+                    "count": (
+                        usage_tracker[request.remote_addr]["count"]
+                        if ENABLE_USAGE_LIMIT
+                        else 0
+                    ),
+                    "remaining": remaining,
+                    "daily_limit": DAILY_LIMIT if ENABLE_USAGE_LIMIT else None,
+                    "limit_enabled": ENABLE_USAGE_LIMIT,
                 },
             }
         )
