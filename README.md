@@ -71,3 +71,63 @@ cp .env.example .env
 ```
 
 2. Abra o arquivo `.env` em um editor de texto e preencha com sua chave API:
+
+```
+API_KEY=sua_chave_api_aqui
+```
+
+### Passo 6: Executar a aplicação
+
+```bash
+# No diretório raiz do projeto
+python app.py
+```
+
+A aplicação estará disponível em `http://127.0.0.1:5000` no seu navegador.
+
+## 🧠 Como usar
+
+1. Acesse a aplicação (online ou localmente)
+2. Escolha o idioma desejado (português ou inglês)
+3. Preencha:
+   - **Descrição**: O que você fez no código
+   - **Arquivos alterados** (opcional): Liste os principais arquivos modificados
+   - **Contexto adicional** (opcional): Forneça qualquer informação relevante
+4. Clique em "Gerar Commit"
+5. Copie a mensagem gerada para usar no seu terminal
+
+![Exemplo de uso](img/header.png)
+
+## 🛠 Tecnologias utilizadas
+
+- **Backend**: Python com Flask
+- **Frontend**: HTML, CSS, JavaScript
+- **IA**: Google Gemini API
+- **Deploy**: Vercel
+
+## 📊 Limitações
+
+- Versão online: 7 gerações de commits por dia por usuário
+- Versão local: Sem limitações, desde que respeitados os limites da sua chave API
+
+## 👥 Contribuições
+
+Contribuições são bem-vindas! Sinta-se à vontade para abrir issues ou enviar pull requests com melhorias.
+
+1. Faça um fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
+3. Commit suas mudanças (`git commit -m 'feat: adiciona nova feature'`)
+4. Push para a branch (`git push origin feature/nova-feature`)
+5. Abra um Pull Request
+
+## 📄 Licença
+
+Este projeto está licenciado sob a [MIT License](LICENSE).
+
+## 📬 Contato
+
+- GitHub: [@Moscarde](https://github.com/Moscarde)
+- Linkedin: [/Moscarde](https://linkedin.com/in/moscarde)
+---
+
+<p align="center">Desenvolvido com 💻 por Gabriel Moscarde</p>
