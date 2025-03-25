@@ -26,7 +26,7 @@ MAX_CHARS = 500
 # Sistema de controle de uso - armazenamento em memória
 # Em um ambiente de produção, seria melhor usar um banco de dados
 usage_tracker = defaultdict(lambda: {"count": 0, "reset_time": None})
-DAILY_LIMIT = 3
+DAILY_LIMIT = 7
 
 
 @app.route("/")
