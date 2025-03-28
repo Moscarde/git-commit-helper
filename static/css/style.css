@@ -92,6 +92,7 @@ html[data-theme="dark"] .moon-icon {
 
 .container {
     max-width: 800px;
+    min-width: 700px;
     margin: 0 auto;
     padding: 30px;
     background-color: var(--container-bg);

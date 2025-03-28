@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	const content = {
 		english: {
 			pattern: "Pattern: <code>&lt;type&gt;: &lt;description&gt;</code>",
-			examples: "Examples: <code>feat: add login functionality</code> | <code>fix: resolve null pointer exception</code>",
+			examples: "Examples: </br><code>feat: add login functionality</code></br><code>fix: resolve null pointer exception</code>",
 			placeholder: "Describe your changes or paste your code here...",
 			generateButton: "Generate Commit",
 			copyButton: "Copy",
@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		},
 		portuguese: {
 			pattern: "Padrão: <code>&lt;type&gt;: &lt;description&gt;</code>",
-			examples: "Exemplos: <code>feat: adicionar funcionalidade de login</code> | <code>fix: resolver exceção de ponteiro nulo</code>",
+			examples: "Exemplos: </br><code>feat: adicionar função de login</code></br><code>fix: exceção de ponteiro nulo</code>",
 			placeholder: "Descreva suas alterações ou cole seu código aqui...",
 			generateButton: "Gerar Commit",
 			copyButton: "Copiar",
